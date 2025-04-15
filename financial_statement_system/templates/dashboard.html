@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row align-items-center">
+        <div class="col-lg-12 d-flex justify-content-center mb-4">
+            <h1 class="text-success">📊 Dashboard</h1>
+        </div>
+    </div>
+
+    <section class="mb-5">
+        <div class="card shadow border-0 rounded-lg">
+            <div class="card-body">
+                <h2 class="mb-3 text-primary">Recent Transactions</h2>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Type</th>
+                                <th>Account</th>
+                                <th>Category</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in transactions %}
+                            <tr>
+                                <td>{{ t['date'] }}</td>
+                                <td>{{ t['description'] or '-' }}</td>
+                                <td class="{{ 'text-success' if t['type'] == 'income' else 'text-danger' }}">
+                                    {{ "${:,.2f}".format(t['amount']) }}
+                                </td>
+                                <td>{{ t['type'].capitalize() }}</td>
+                                <td>{{ t['account_name'] }}</td>
+                                <td>{{ t['category_name'] or '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{{ url_for('view_transactions') }}" class="btn btn-outline-primary mt-2">View All Transactions</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-5">
+        <div class="card shadow border-0 rounded-lg">
+            <div class="card-body">
+                <h2 class="mb-3 text-primary">Accounts</h2>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Account</th>
+                                <th>Type</th>
+                                <th>Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in accounts %}
+                            <tr>
+                                <td>{{ a['name'] }}</td>
+                                <td>{{ a['type'].capitalize() }}</td>
+                                <td class="{{ 'text-success' if a['balance'] >= 0 else 'text-danger' }}">
+                                    {{ "${:,.2f}".format(a['balance']) }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="card shadow border-0 rounded-lg">
+            <div class="card-body">
+                <h2 class="mb-3 text-primary">Quick Financial Overview</h2>
+                <div class="alert {{ 'alert-success' if income_statement['net_income'] >= 0 else 'alert-danger' }}">
+                    <strong>Net Income (Last 30 Days):</strong>
+                    {{ "${:,.2f}".format(income_statement['net_income']) }}
+                </div>
+                <a href="{{ url_for('view_reports') }}" class="btn btn-outline-success">View Detailed Reports</a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

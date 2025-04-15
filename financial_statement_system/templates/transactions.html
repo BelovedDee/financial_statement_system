@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Transactions{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row align-items-center mb-4">
+        <div class="col-lg-12 d-flex justify-content-between">
+            <h1 class="text-primary">💰 Transactions</h1>
+            <a href="{{ url_for('add_transaction_view') }}" class="btn btn-success">➕ Add Transaction</a>
+        </div>
+    </div>
+
+    <div class="card shadow border-0 rounded-lg">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Type</th>
+                            <th>Account</th>
+                            <th>Category</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in transactions %}
+                        <tr>
+                            <td>{{ t['date'] }}</td>
+                            <td>{{ t['description'] or '-' }}</td>
+                            <td class="{{ 'text-success' if t['type'] == 'income' else 'text-danger' }}">
+                                {{ "${:,.2f}".format(t['amount']) }}
+                            </td>
+                            <td class="text-capitalize">{{ t['type'] }}</td>
+                            <td>{{ t['account_name'] }}</td>
+                            <td>{{ t['category_name'] or '-' }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('delete_transaction_view', transaction_id=t['id']) }}"
+                                      onsubmit="return confirm('Are you sure you want to delete this transaction?');">
+                                    <button type="submit" class="btn btn-sm btn-danger">🗑️ Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block title %}Financial Reports{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row align-items-center mb-4">
+        <div class="col-lg-12 d-flex justify-content-center">
+            <h1 class="text-primary">📊 Financial Reports</h1>
+        </div>
+    </div>
+
+    <form method="GET" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label for="start_date" class="form-label">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" class="form-control" value="{{ income_statement['start_date'] }}">
+        </div>
+        <div class="col-md-4">
+            <label for="end_date" class="form-label">End Date:</label>
+            <input type="date" id="end_date" name="end_date" class="form-control" value="{{ income_statement['end_date'] }}">
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-success w-100">Filter</button>
+        </div>
+    </form>
+
+    <section class="mb-5">
+        <div class="card shadow border-0 rounded-lg">
+            <div class="card-body">
+                <h2 class="text-success">Income Statement</h2>
+                <p><strong>Period:</strong> {{ income_statement['start_date'] }} to {{ income_statement['end_date'] }}</p>
+
+                <h4>Income</h4>
+                <table class="table table-bordered table-hover">
+                    <tbody>
+                        {% for item in income_statement['income'] %}
+                        <tr>
+                            <td>{{ item['category'] }}</td>
+                            <td class="text-success">{{ "${:,.2f}".format(item['total']) }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="table-success fw-bold">
+                            <td>Total Income</td>
+                            <td>{{ "${:,.2f}".format(income_statement['total_income']) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Expenses</h4>
+                <table class="table table-bordered table-hover">
+                    <tbody>
+                        {% for item in income_statement['expenses'] %}
+                        <tr>
+                            <td>{{ item['category'] }}</td>
+                            <td class="text-danger">{{ "${:,.2f}".format(item['total']) }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="table-danger fw-bold">
+                            <td>Total Expenses</td>
+                            <td>{{ "${:,.2f}".format(income_statement['total_expenses']) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Net Income</h4>
+                <p class="fs-5 fw-semibold {{ 'text-success' if income_statement['net_income'] >= 0 else 'text-danger' }}">
+                    {{ "${:,.2f}".format(income_statement['net_income']) }}
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-5">
+        <div class="card shadow border-0 rounded-lg">
+            <div class="card-body">
+                <h2 class="text-primary">Balance Sheet</h2>
+                <p><strong>As of:</strong> {{ balance_sheet['as_of_date'] }}</p>
+
+                <h4>Assets</h4>
+                <table class="table table-bordered table-hover">
+                    <tbody>
+                        {% for item in balance_sheet['assets'] %}
+                        <tr>
+                            <td>{{ item['name'] }}</td>
+                            <td class="text-success">{{ "${:,.2f}".format(item['balance']) }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="table-success fw-bold">
+                            <td>Total Assets</td>
+                            <td>{{ "${:,.2f}".format(balance_sheet['total_assets']) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Liabilities</h4>
+                <table class="table table-bordered table-hover">
+                    <tbody>
+                        {% for item in balance_sheet['liabilities'] %}
+                        <tr>
+                            <td>{{ item['name'] }}</td>
+                            <td class="text-danger">{{ "${:,.2f}".format(item['balance']) }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="table-danger fw-bold">
+                            <td>Total Liabilities</td>
+                            <td>{{ "${:,.2f}".format(balance_sheet['total_liabilities']) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Equity</h4>
+                <table class="table table-bordered table-hover">
+                    <tbody>
+                        {% for item in balance_sheet['equity'] %}
+                        <tr>
+                            <td>{{ item[0] }}</td>
+                            <td class="{{ 'text-success' if item[1] >= 0 else 'text-danger' }}">
+                                {{ "${:,.2f}".format(item[1]) }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="fw-bold {{ 'table-success' if balance_sheet['total_equity'] >= 0 else 'table-danger' }}">
+                            <td>Total Equity</td>
+                            <td>{{ "${:,.2f}".format(balance_sheet['total_equity']) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="mt-3">
+                    <strong>Balance Check:</strong> Assets ({{ "${:,.2f}".format(balance_sheet['total_assets']) }}) = 
+                    Liabilities ({{ "${:,.2f}".format(balance_sheet['total_liabilities']) }}) + 
+                    Equity ({{ "${:,.2f}".format(balance_sheet['total_equity']) }})
+                </p>
+                <p><strong>Difference:</strong> {{ "${:,.2f}".format(balance_sheet['balance_check']) }}</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="card shadow border-0 rounded-lg">
+            <div class="card-body">
+                <h2 class="text-info">Cash Flow Statement</h2>
+                <p><strong>Period:</strong> {{ cash_flow['start_date'] }} to {{ cash_flow['end_date'] }}</p>
+
+                <table class="table table-bordered table-hover">
+                    <tbody>
+                        <tr>
+                            <td>Cash from Operating Activities</td>
+                            <td class="{{ 'text-success' if cash_flow['cash_from_operations'] >= 0 else 'text-danger' }}">
+                                {{ "${:,.2f}".format(cash_flow['cash_from_operations']) }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Cash from Investing Activities</td>
+                            <td class="{{ 'text-success' if cash_flow['cash_from_investing'] >= 0 else 'text-danger' }}">
+                                {{ "${:,.2f}".format(cash_flow['cash_from_investing']) }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Cash from Financing Activities</td>
+                            <td class="{{ 'text-success' if cash_flow['cash_from_financing'] >= 0 else 'text-danger' }}">
+                                {{ "${:,.2f}".format(cash_flow['cash_from_financing']) }}
+                            </td>
+                        </tr>
+                        <tr class="fw-bold {{ 'table-success' if cash_flow['net_cash_flow'] >= 0 else 'table-danger' }}">
+                            <td>Net Cash Flow</td>
+                            <td>{{ "${:,.2f}".format(cash_flow['net_cash_flow']) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
